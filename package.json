@@ -1,0 +1,17 @@
+{
+  "name": "hybrid-web-mobile-typescript",
+  "version": "1.0.0",
+  "description": "Hybrid web + mobile automation framework using Playwright (web) and Appium via webdriverio (mobile), sharing one Playwright Test runner",
+  "private": true,
+  "scripts": {
+    "test:web": "playwright test --project=web",
+    "test:mobile": "playwright test --project=mobile",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0",
+    "@types/node": "^20.14.15",
+    "typescript": "^5.5.4",
+    "webdriverio": "^9.0.0"
+  }
+}
