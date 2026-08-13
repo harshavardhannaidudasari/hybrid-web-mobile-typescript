@@ -29,6 +29,14 @@ export const test = base.extend<MobileFixtures>({
             },
         });
 
+        // appium:appPackage/appActivity alone don't reliably foreground a
+        // pre-installed system app like Settings on every UiAutomator2
+        // version - activate it explicitly so tests don't start on the
+        // home screen.
+        await driver.execute('mobile: startActivity', {
+            intent: `${env.android.appPackage}/${env.android.appActivity}`,
+        });
+
         await use(driver);
 
         await driver.deleteSession();
