@@ -6,6 +6,7 @@
   "scripts": {
     "test:web": "playwright test --project=web",
     "test:mobile": "playwright test --project=mobile",
+    "test:ios": "playwright test --project=ios",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

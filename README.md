@@ -25,13 +25,16 @@ WebdriverIO's own capability switching.
 ## Project layout
 
 ```
-playwright.config.ts       # "web" and "mobile" projects
-fixtures/mobileFixture.ts  # extends Playwright Test with an Appium session
+playwright.config.ts       # "web", "mobile" and "ios" projects
+fixtures/mobileFixture.ts  # extends Playwright Test with a local Appium session (Android)
+fixtures/iosFixture.ts     # extends Playwright Test with a BrowserStack App Automate session (iOS)
 src/config/env.ts
 src/pages/web/             # BasePage, LoginPage, InventoryPage (Playwright locators)
 src/pages/mobile/          # BaseScreen, SettingsScreen (webdriverio Browser)
+src/pages/ios/             # SampleScreen (webdriverio Browser, drives BStackSampleApp)
 tests/web/login.spec.ts        # saucedemo.com
 tests/mobile/settingsSearch.spec.ts  # Android Settings app (no APK needed)
+tests/ios/sample.spec.ts             # BrowserStack sample app (BStackSampleApp)
 ```
 
 ## Prerequisites
@@ -39,6 +42,9 @@ tests/mobile/settingsSearch.spec.ts  # Android Settings app (no APK needed)
 - Node.js 18+
 - For mobile tests: Appium server (`npm i -g appium && appium`), Android
   emulator/device, `appium driver install uiautomator2`
+- For iOS tests: a [BrowserStack](https://www.browserstack.com/app-automate)
+  account (App Automate) - see below. No local Mac/simulator is required
+  since the session runs on BrowserStack's real-device cloud.
 
 ## Setup
 
@@ -56,12 +62,55 @@ npm run test:web
 # Mobile (requires Appium server running on 127.0.0.1:4723)
 npm run test:mobile
 
+# iOS (requires BrowserStack credentials - see below)
+npm run test:ios
+
 # Type-check only
 npm run typecheck
 ```
 
+## iOS (BrowserStack App Automate)
+
+The `ios` project (`tests/ios/`) runs against
+[BrowserStack App Automate](https://www.browserstack.com/app-automate)
+instead of a local Mac/simulator, since local iOS simulation isn't possible
+on this machine. It drives BrowserStack's own public demo app,
+**BStackSampleApp**, tapping `Text Button`, typing into `Text Input`, and
+asserting the value round-trips into `Text Output`.
+
+### One-time setup: upload the sample app
+
+BrowserStack needs the `.ipa` uploaded to their storage once; the returned
+`app_url` becomes `BROWSERSTACK_APP_ID`:
+
+```bash
+curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+  -F "url=https://www.browserstack.com/app-automate/sample-apps/ios/BStackSampleApp.ipa"
+```
+
+This returns `{"app_url":"bs://<hash>"}` - use that full `bs://...` string as
+`BROWSERSTACK_APP_ID`.
+
+### Required environment variables
+
+| Variable                  | Description                                              | Default                                       |
+|----------------------------|------------------------------------------------------------|------------------------------------------------|
+| `BROWSERSTACK_USERNAME`    | BrowserStack account username                               | *(none - required)*                            |
+| `BROWSERSTACK_ACCESS_KEY`  | BrowserStack access key                                     | *(none - required)*                            |
+| `BROWSERSTACK_APP_ID`      | `bs://...` value returned by the upload step above          | *(none - required)*                            |
+| `BROWSERSTACK_HUB_URL`     | App Automate hub URL                                        | `https://hub-cloud.browserstack.com/wd/hub`     |
+| `IOS_DEVICE_NAME`          | Target device                                                | `iPhone 14`                                     |
+| `IOS_PLATFORM_VERSION`     | Target iOS version                                           | `17`                                            |
+
+### Running just the iOS suite
+
+```bash
+npx playwright test --project=ios
+```
+
 ## CI
 
-`.github/workflows/ci.yml` runs the web suite on every push/PR. Mobile tests
-require a real device/emulator + Appium server, so they're left for local or
-device-farm execution (`npm run test:mobile`).
+`.github/workflows/ci.yml` runs the web suite on every push/PR. Mobile and
+iOS tests require a real device/emulator + Appium server, or BrowserStack
+credentials respectively, so they're left for local or device-farm execution
+(`npm run test:mobile`, `npm run test:ios`).

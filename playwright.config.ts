@@ -20,5 +20,14 @@ export default defineConfig({
             // the other platform's setup.
             workers: 1,
         },
+        {
+            name: 'ios',
+            testDir: './tests/ios',
+            // No browser is launched here either - the iosDriver fixture
+            // opens an Appium session against BrowserStack App Automate.
+            // Separate testDir from "mobile" (Android/local Appium) so
+            // `--project=ios` cleanly selects only the BrowserStack suite.
+            workers: 1,
+        },
     ],
 });
