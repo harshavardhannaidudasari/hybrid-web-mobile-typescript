@@ -1,5 +1,7 @@
 # Hybrid Web + Mobile Automation Framework (TypeScript)
 
+[![CI](https://github.com/harshavardhannaidudasari/hybrid-web-mobile-typescript/actions/workflows/ci.yml/badge.svg)](https://github.com/harshavardhannaidudasari/hybrid-web-mobile-typescript/actions/workflows/ci.yml)
+
 A single [Playwright Test](https://playwright.dev) runner drives **both**
 suites: web tests use Playwright's native browser automation, and mobile
 tests use a custom `mobileDriver` fixture (`fixtures/mobileFixture.ts`) that
